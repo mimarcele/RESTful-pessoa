@@ -33,7 +33,7 @@ public class PessoaController {
     @ApiOperation(value = "Consultar pessoa do banco de dados")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public PessoaDto consultar(@PathVariable final Long id) {
+    public PessoaDto buscar(@PathVariable final Long id) {
         return pessoaService.buscar(id);
     }
 

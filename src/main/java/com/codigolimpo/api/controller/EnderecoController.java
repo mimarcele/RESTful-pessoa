@@ -3,51 +3,50 @@ package com.codigolimpo.api.controller;
 import com.codigolimpo.api.dto.EnderecoDto;
 import com.codigolimpo.domain.service.impl.EnderecoServiceImpl;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/endereco")
+@RequestMapping("/enderecos")
+@RequiredArgsConstructor
 public class EnderecoController {
 
-    @Autowired
-    private EnderecoServiceImpl enderecoService;
+    private final EnderecoServiceImpl enderecoService;
 
     @ApiOperation(value = "Cadastrar endereço no banco de dados")
     @PostMapping
-    public ResponseEntity<EnderecoDto> criar(@RequestBody EnderecoDto enderecoDto1){
-        EnderecoDto enderecoDto = enderecoService.criar(enderecoDto1);
-        return ResponseEntity.ok(enderecoDto);
+    @ResponseStatus(HttpStatus.CREATED)
+    public EnderecoDto criar(@RequestBody final EnderecoDto dto){
+        return enderecoService.criar(dto);
     }
 
     @ApiOperation(value = "Listar endereços cadastrados no banco de dados")
     @GetMapping
     public ResponseEntity<List<EnderecoDto>> listar(){
-        List<EnderecoDto> enderecosDtos = enderecoService.listar();
-        return ResponseEntity.ok(enderecosDtos);
+        return ResponseEntity.ok(enderecoService.listar());
     }
 
     @ApiOperation(value = "Atualizar endereço no banco de dados")
     @GetMapping("/{id}")
-    public EnderecoDto buscar(@PathVariable Long id){
-        EnderecoDto enderecoDto = enderecoService.buscar(id);
-        return enderecoDto;
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public EnderecoDto buscar(@PathVariable final Long id){
+        return enderecoService.buscar(id);
     }
 
     @ApiOperation(value = "Atualizar endereço do banco de dados")
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id){
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletar(@PathVariable final Long id){
         enderecoService.deletar(id);
     }
 
     @ApiOperation(value = "Atualizar endereco no banco de dados")
     @PutMapping
-    public ResponseEntity<EnderecoDto> atualizar(@RequestBody EnderecoDto enderecoDto){
-        EnderecoDto enderecoDto1 = enderecoService.atualizar(enderecoDto);
-        return ResponseEntity.ok(enderecoDto1);
+    public ResponseEntity<EnderecoDto> atualizar(@RequestBody final EnderecoDto enderecoDto){
+        return ResponseEntity.ok(enderecoService.atualizar(enderecoDto));
     }
-
 }

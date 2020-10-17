@@ -1,7 +1,6 @@
 package com.codigolimpo.api.dto.pessoa;
 
 import com.codigolimpo.api.dto.EnderecoDto;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
