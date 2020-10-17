@@ -30,10 +30,6 @@ public class EnderecoServiceImpl implements EnderecoService {
                 .map(mapperEnderecoEnderecoDto::toEntity)
                 .map(en -> criarEnderecoEToDto(en))
                 .orElseThrow(() -> new EnderecoNotFoundException("Endereço não encontrado"));
-//        Endereco endereco = mapperEnderecoEnderecoDto.toEntity(enderecoDto);
-//        endereco = enderecoRepository.save(endereco);
-//        EnderecoDto enderecoDto1 = mapperEnderecoEnderecoDto.toDto(endereco);
-//        return enderecoDto1;
     }
 
     @Override
@@ -43,28 +39,12 @@ public class EnderecoServiceImpl implements EnderecoService {
                 .map(endereco -> mapperEnderecoEnderecoDto.toDto(endereco))
                 .collect(Collectors.toList());
 
-//        List<Endereco> enderecos = enderecoRepository.findAll();
-//
-//        List<EnderecoDto> enderecoDtos = enderecos
-//                .stream()
-//                .map(endereco -> {
-//                    return mapperEnderecoEnderecoDto.toDto(endereco);
-//                })
-//                .collect(Collectors.toList());
-//        return enderecoDtos;
     }
 
     @Override
     public EnderecoDto buscar(final Long id) {
         return mapperEnderecoEnderecoDto.toDto(enderecoRepository.getOne(id));
 
-//        Optional<Endereco> enderecoOptional = enderecoRepository.findById(id);
-//
-//        Endereco endereco = enderecoOptional
-//                .orElseThrow(() -> new EnderecoNotFoundException("Endereço " + id + " não encontrado"));
-//
-//        EnderecoDto enderecoDto = mapperEnderecoEnderecoDto.toDto(endereco);
-//        return enderecoDto;
     }
 
     @Override
@@ -74,11 +54,6 @@ public class EnderecoServiceImpl implements EnderecoService {
         } catch (Exception e){
 
         }
-//        Optional<Endereco> enderecoOptional = enderecoRepository.findById(id);
-//
-//        Endereco endereco = enderecoOptional
-//                .orElseThrow(() -> new EnderecoNotFoundException("Endereço " + id + " não encontrado"));
-//        enderecoRepository.delete(enderecoOptional.get());
     }
 
     @Override
