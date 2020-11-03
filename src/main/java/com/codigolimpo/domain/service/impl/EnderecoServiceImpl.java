@@ -1,13 +1,14 @@
 package com.codigolimpo.domain.service.impl;
 
-import com.codigolimpo.api.dto.EnderecoDto;
-import com.codigolimpo.domain.entities.Endereco;
+import com.codigolimpo.api.dto.endereco.EnderecoRequestDto;
+import com.codigolimpo.api.dto.endereco.EnderecoResponseDto;
 import com.codigolimpo.api.exception.EnderecoNotFoundException;
-import com.codigolimpo.api.mappers.MapperEnderecoEnderecoDto;
+import com.codigolimpo.api.mappers.MapperEnderecoEnderecoRequestDto;
+import com.codigolimpo.api.mappers.MapperEnderecoEnderecoResponseDto;
+import com.codigolimpo.domain.entities.Endereco;
 import com.codigolimpo.domain.repository.EnderecoRepository;
 import com.codigolimpo.domain.service.EnderecoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,65 +22,70 @@ import static java.util.Optional.of;
 public class EnderecoServiceImpl implements EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
+    private final MapperEnderecoEnderecoRequestDto mapperEnderecoEnderecoRequestDto;
+    private final MapperEnderecoEnderecoResponseDto mapperEnderecoEnderecoResponseDto;
 
-    private final MapperEnderecoEnderecoDto mapperEnderecoEnderecoDto;
 
     @Override
-    public EnderecoDto criar(final EnderecoDto enderecoDto) {
-        return of(enderecoDto)
-                .map(mapperEnderecoEnderecoDto::toEntity)
-                .map(en -> criarEnderecoEToDto(en))
-                .orElseThrow(() -> new EnderecoNotFoundException("Endereço não encontrado"));
+    public EnderecoResponseDto criar(EnderecoRequestDto enderecoRequestDto) {
+        return of(enderecoRequestDto)
+                .map(mapperEnderecoEnderecoRequestDto::toEntity)
+                .map(endereco -> criarEnderecoEToDto(mapperEnderecoEnderecoRequestDto.toEntity(enderecoRequestDto)))
+                .orElseThrow(() -> new EnderecoNotFoundException("Falha ao criar endereço"));
+//
     }
 
     @Override
-    public List<EnderecoDto> listar() {
-        return enderecoRepository.findAll()
-                .stream()
-                .map(endereco -> mapperEnderecoEnderecoDto.toDto(endereco))
-                .collect(Collectors.toList());
-
+    public List<EnderecoResponseDto> listar() {
+                return enderecoRepository.findAll()
+                        .stream()
+                        .map(endereco -> mapperEnderecoEnderecoResponseDto.toDto(endereco))
+                        .collect(Collectors.toList());
     }
 
     @Override
-    public EnderecoDto buscar(final Long id) {
-        return mapperEnderecoEnderecoDto.toDto(enderecoRepository.getOne(id));
-
+    public EnderecoResponseDto buscar(Long id) {
+        return mapperEnderecoEnderecoResponseDto.toDto(enderecoRepository.getOne(id));
     }
 
     @Override
-    public void deletar(final Long id) {
+    public void deletar(Long id) {
         try{
             enderecoRepository.deleteById(id);
         } catch (Exception e){
-
+            throw new EnderecoNotFoundException("Endereço não encontrado");
         }
     }
 
+
     @Override
-    public EnderecoDto atualizar(final EnderecoDto enderecoDto) {
-        Optional<Endereco> enderecoOptional = enderecoRepository.findById(enderecoDto.getId());
+    public EnderecoResponseDto atualizar(EnderecoRequestDto enderecoRequestDto) {
+               Optional<Endereco> enderecoOptional = enderecoRepository.findById(enderecoRequestDto.getId());
 
         Endereco endereco = enderecoOptional
-                .orElseThrow(() -> new EnderecoNotFoundException("Endereço " + enderecoDto.getId() + " não encontrado"));
+                .orElseThrow(() -> new EnderecoNotFoundException("Endereço " + enderecoRequestDto.getId() + " não encontrado"));
 
-        mapperEnderecoEnderecoDto.toEntityAtualizar(enderecoDto, endereco);
+        mapperEnderecoEnderecoRequestDto.toEntityUpdate(enderecoRequestDto, endereco);
         enderecoRepository.save(endereco);
 
-        EnderecoDto enderecoDto1 = mapperEnderecoEnderecoDto.toDto(endereco);
-        return enderecoDto1;
+        mapperEnderecoEnderecoRequestDto.toDto(endereco);
+        EnderecoResponseDto enderecoResponseDto = new EnderecoResponseDto(); //verificar se está certo
+     return enderecoResponseDto;
     }
 
+
     @Override
-    public Endereco findById(final Long id) {
-        return enderecoRepository.findById(id)
+    public Endereco findById(Long id) {
+                return enderecoRepository.findById(id)
                 .orElseThrow(() -> new EnderecoNotFoundException("Endereço " + id + " não encontrado"));
     }
 
-    private EnderecoDto criarEnderecoEToDto(final Endereco endereco){
+    private EnderecoResponseDto criarEnderecoEToDto(final Endereco endereco){
         return of(enderecoRepository.save(endereco))
-                .map(mapperEnderecoEnderecoDto::toDto)
+                .map(mapperEnderecoEnderecoResponseDto::toDto)
                 .orElseThrow(() -> new EnderecoNotFoundException("Endereço não encontrado"));
+
     }
+
 }
 

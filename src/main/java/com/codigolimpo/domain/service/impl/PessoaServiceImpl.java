@@ -1,12 +1,14 @@
 package com.codigolimpo.domain.service.impl;
 
-import com.codigolimpo.api.dto.PessoaDto;
+import com.codigolimpo.api.dto.pessoa.PessoaRequestDto;
+import com.codigolimpo.api.dto.pessoa.PessoaResponseDto;
 import com.codigolimpo.api.exception.PessoaCreateException;
+import com.codigolimpo.api.exception.PessoaNotFoundException;
 import com.codigolimpo.api.exception.PessoaUpdateException;
+import com.codigolimpo.api.mappers.MapperPessoaPessoaRequestDto;
+import com.codigolimpo.api.mappers.MapperPessoaPessoaResponseDto;
 import com.codigolimpo.domain.entities.Endereco;
 import com.codigolimpo.domain.entities.Pessoa;
-import com.codigolimpo.api.exception.PessoaNotFoundException;
-import com.codigolimpo.api.mappers.MapperPessoaPessoaDto;
 import com.codigolimpo.domain.repository.PessoaRepository;
 import com.codigolimpo.domain.service.EnderecoService;
 import com.codigolimpo.domain.service.PessoaService;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
@@ -22,50 +25,55 @@ import static java.util.Optional.of;
 @RequiredArgsConstructor
 public class PessoaServiceImpl implements PessoaService {
 
-    private final MapperPessoaPessoaDto mapperPessoaPessoaDto;
+    private final MapperPessoaPessoaResponseDto mapperPessoaPessoaResponseDto;
+    private final MapperPessoaPessoaRequestDto mapperPessoaPessoaRequestDto;
     private final PessoaRepository pessoaRepository;
     private final EnderecoService enderecoService;
 
     @Override
-    public PessoaDto criar(final PessoaDto pessoaDto) {
-        return of(pessoaDto)
-                .map(mapperPessoaPessoaDto::toEntity)
-                .map(p -> criarPessoaEToDto(p))
-                .orElseThrow(() -> new PessoaCreateException("Falha ao criar a pessoa: " + pessoaDto));
+    public PessoaResponseDto criar(final PessoaRequestDto pessoaRequestDto) {
+                return of(pessoaRequestDto)
+                .map(mapperPessoaPessoaRequestDto::toEntity)
+                .map(p -> criar(pessoaRequestDto))
+                .orElseThrow(() -> new PessoaCreateException("Falha ao criar a pessoa: " + pessoaRequestDto));
     }
 
     @Override
-    public List<PessoaDto> listar() {
-        return pessoaRepository.findAll()
+    public List<PessoaResponseDto> listar() {
+                return pessoaRepository.findAll()
                 .stream()
-                .map(pessoa -> mapperPessoaPessoaDto.toDto(pessoa))
+                .map(pessoa -> mapperPessoaPessoaResponseDto.toDto(pessoa))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public PessoaDto buscar(final Long id) {
-        return mapperPessoaPessoaDto.toDto(getPessoa(id));
+    public PessoaResponseDto buscar(final Long id) {
+     return mapperPessoaPessoaResponseDto.toDto(pessoaRepository.getOne(id));
     }
 
     @Override
-    public void deletar(Long id) {
+    public void deletar(final Long id) {
         try {
             pessoaRepository.deleteById(id);
         } catch (Exception e) {
+            throw new PessoaNotFoundException("Pessoa não encontrada");
         }
     }
 
     @Override
-    public PessoaDto atualizar(final PessoaDto pessoaDto) {
-        return of(getPessoa(pessoaDto.getId()))
-                .map(p -> mapperPessoaPessoaDto.toEntityUpdate(pessoaDto, p))
-                .map(p -> criarPessoaEToDto(p))
-                .orElseThrow(() -> new PessoaUpdateException("Falha ao atualizar a pessoa com id: " + pessoaDto.getId()));
+    public PessoaResponseDto atualizar(final PessoaRequestDto pessoaRequestDto) {
+                return of(getPessoa(pessoaRequestDto.getId()))
+                .map(p -> { mapperPessoaPessoaRequestDto.toEntityUpdate(pessoaRequestDto, p);
+                    return p;
+                })
+                .map(this::criarPessoaEToDto)
+                .orElseThrow(() -> new PessoaUpdateException("Falha ao atualizar a pessoa com id: " + pessoaRequestDto.getId()));
     }
 
     @Override
-    public PessoaDto adicionarEndereco(final Long idEndereco, final Long idPessoa) {
-        return of(getPessoa(idPessoa))
+    public PessoaResponseDto adicionarEndereco(final Long idEndereco, final Long idPessoa) {
+//        return Optional.of()
+                return of(getPessoa(idPessoa))
                 .map(p -> {
                     final Endereco endereco = enderecoService.findById(idEndereco);
                     p.adicionarEndereco(endereco);
@@ -76,27 +84,28 @@ public class PessoaServiceImpl implements PessoaService {
     }
 
     @Override
-    public PessoaDto removerEndereco(final Long idEndereco, final Long idPessoa) {
-        return of(getPessoa(idPessoa))
+    public PessoaResponseDto removerEndereco(final Long idEndereco,final Long idPessoa) {
+                return of(getPessoa(idPessoa))
                 .map(p -> {
                     final Endereco endereco = enderecoService.findById(idEndereco);
                     p.removerEndereco(endereco);
                     return p;
                 })
+
                 .map(p -> criarPessoaEToDto(p))
                 .orElseThrow(() -> new PessoaUpdateException("Falha ao adicionar o endereço a pessoa:" + idPessoa));
     }
 
-    private Pessoa getPessoa(final Long id) {
-        return pessoaRepository.findById(id)
-                .orElseThrow(() -> new PessoaNotFoundException("Pessoa " + id + " não encontrada"));
+        private PessoaResponseDto criarPessoaEToDto(final Pessoa pessoa) {
+        return Optional.of(pessoaRepository.save((pessoa)))
+                .map(mapperPessoaPessoaResponseDto::toDto)
+                .orElseThrow(() -> new PessoaUpdateException("Falha no processo de salvar e transformar a pessoa em DTO. Pessoa: "));
     }
 
-    private PessoaDto criarPessoaEToDto(final Pessoa pessoa) {
-        return of(pessoaRepository.save(pessoa))
-                .map(mapperPessoaPessoaDto::toDto)
-                .orElseThrow(() -> new PessoaUpdateException("Falha no processo de salvar e transformar a pessoa em DTO. Pessoa: " + pessoa));
+    private Pessoa getPessoa(final Long id){
+        return pessoaRepository.findById(id).orElseThrow(() -> new PessoaNotFoundException("Pessoa não encontrada"));
     }
+
 }
 
 

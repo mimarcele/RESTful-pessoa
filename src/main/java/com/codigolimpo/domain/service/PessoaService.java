@@ -1,21 +1,22 @@
 package com.codigolimpo.domain.service;
 
-import com.codigolimpo.api.dto.PessoaDto;
+import com.codigolimpo.api.dto.pessoa.PessoaRequestDto;
+import com.codigolimpo.api.dto.pessoa.PessoaResponseDto;
 
 import java.util.List;
 
 public interface PessoaService {
-    PessoaDto criar(PessoaDto pessoaDto);
+    PessoaResponseDto criar(PessoaRequestDto pessoaRequestDto);
 
-    List<PessoaDto> listar();
+    List<PessoaResponseDto> listar();
 
-    PessoaDto buscar(Long id);
+    PessoaResponseDto buscar(Long id);
 
     void deletar(Long id);
 
-    PessoaDto atualizar(PessoaDto pessoaDto);
+    PessoaResponseDto atualizar(PessoaRequestDto pessoaRequestDto);
 
-    PessoaDto adicionarEndereco(Long idEndereco, Long idPessoa);
+    PessoaResponseDto adicionarEndereco(Long idEndereco, Long idPessoa);
 
-    PessoaDto removerEndereco(Long idEndereco, Long idPessoa);
+    PessoaResponseDto removerEndereco(Long idEndereco, Long idPessoa);
 }

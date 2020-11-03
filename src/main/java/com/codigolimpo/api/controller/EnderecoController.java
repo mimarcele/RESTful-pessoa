@@ -1,6 +1,7 @@
 package com.codigolimpo.api.controller;
 
-import com.codigolimpo.api.dto.EnderecoDto;
+import com.codigolimpo.api.dto.endereco.EnderecoRequestDto;
+import com.codigolimpo.api.dto.endereco.EnderecoResponseDto;
 import com.codigolimpo.domain.service.impl.EnderecoServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,20 @@ public class EnderecoController {
     @ApiOperation(value = "Cadastrar endereço no banco de dados")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EnderecoDto criar(@RequestBody final EnderecoDto dto){
+    public EnderecoResponseDto criar(@RequestBody final EnderecoRequestDto dto){
         return enderecoService.criar(dto);
     }
 
     @ApiOperation(value = "Listar endereços cadastrados no banco de dados")
     @GetMapping
-    public ResponseEntity<List<EnderecoDto>> listar(){
+    public ResponseEntity<List<EnderecoResponseDto>> listar(){
         return ResponseEntity.ok(enderecoService.listar());
     }
 
     @ApiOperation(value = "Atualizar endereço no banco de dados")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public EnderecoDto buscar(@PathVariable final Long id){
+    public EnderecoResponseDto buscar(@PathVariable final Long id){
         return enderecoService.buscar(id);
     }
 
@@ -46,7 +47,7 @@ public class EnderecoController {
 
     @ApiOperation(value = "Atualizar endereco no banco de dados")
     @PutMapping
-    public ResponseEntity<EnderecoDto> atualizar(@RequestBody final EnderecoDto enderecoDto){
-        return ResponseEntity.ok(enderecoService.atualizar(enderecoDto));
+    public ResponseEntity<EnderecoResponseDto> atualizar(@RequestBody final EnderecoRequestDto enderecoRequestDto){
+        return ResponseEntity.ok(enderecoService.atualizar(enderecoRequestDto));
     }
 }

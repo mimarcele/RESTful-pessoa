@@ -1,6 +1,8 @@
 package com.codigolimpo.api.controller;
 
-import com.codigolimpo.api.dto.PessoaDto;
+
+import com.codigolimpo.api.dto.pessoa.PessoaRequestDto;
+import com.codigolimpo.api.dto.pessoa.PessoaResponseDto;
 import com.codigolimpo.domain.service.impl.PessoaServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +22,20 @@ public class PessoaController {
     @ApiOperation(value = "Cadastrar pessoa no banco de dados")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PessoaDto criar(@RequestBody final PessoaDto dto) {
+    public PessoaResponseDto criar(@RequestBody final PessoaRequestDto dto) {
         return pessoaService.criar(dto);
     }
 
     @ApiOperation(value = "Listar pessoas cadastradas no banco de dados")
     @GetMapping
-    public ResponseEntity<List<PessoaDto>> listar() {
+    public ResponseEntity<List<PessoaResponseDto>> listar() {
         return ResponseEntity.ok(pessoaService.listar());
     }
 
     @ApiOperation(value = "Consultar pessoa do banco de dados")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public PessoaDto buscar(@PathVariable final Long id) {
+    public PessoaResponseDto buscar(@PathVariable final Long id) {
         return pessoaService.buscar(id);
     }
 
@@ -46,20 +48,20 @@ public class PessoaController {
 
     @ApiOperation(value = "Atualizar pessoa no banco de dados")
     @PutMapping
-    public ResponseEntity<PessoaDto> atualizar(@RequestBody final PessoaDto pessoaDto) {
-        return ResponseEntity.ok(pessoaService.atualizar(pessoaDto));
+    public ResponseEntity<PessoaResponseDto> atualizar(@RequestBody final PessoaRequestDto pessoaRequestDto) {
+        return ResponseEntity.ok(pessoaService.atualizar(pessoaRequestDto));
     }
 
     @ApiOperation(value = "Adicionar pessoa a um endereço")
     @PatchMapping("/{idpessoa}/add/{idendereco}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public PessoaDto adicionarEndereco(@PathVariable("idpessoa") final Long idPessoa, final @PathVariable("idendereco") Long idEndereco) {
+    public PessoaResponseDto adicionarEndereco(@PathVariable("idpessoa") final Long idPessoa, final @PathVariable("idendereco") Long idEndereco) {
         return pessoaService.adicionarEndereco(idPessoa, idEndereco);
     }
 
     @ApiOperation(value = "Deletar endereço")
     @PatchMapping("/{idpessoa}/remove/{idendereco}")
-    public ResponseEntity<PessoaDto> deletarEndereco(@PathVariable("idpessoa") final Long idPessoa, final @PathVariable("idendereco") Long idEndereco) {
+    public ResponseEntity<PessoaResponseDto> deletarEndereco(@PathVariable("idpessoa") final Long idPessoa, final @PathVariable("idendereco") Long idEndereco) {
         return ResponseEntity.ok(pessoaService.removerEndereco(idEndereco, idPessoa));
     }
 }
